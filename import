@@ -1,0 +1,24 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__.'/vendor/autoload.php';
+
+use App\Application\Repository\EmployeeRepository;
+use App\Application\Repository\EventEmployeeRepository;
+use App\Application\Repository\EventRepository;
+use App\Domain\DataImportService;
+use App\Infrastructure\Db\Repository;
+
+try {
+    // No IoC (Inversion of Control) container was implemented, hence the lack of DI and this ugliness.
+    $dbRepo = new Repository();
+    $importService = new DataImportService(
+        new EmployeeRepository($dbRepo),
+        new EventRepository($dbRepo),
+        new EventEmployeeRepository($dbRepo),
+    );
+    $importService->import();
+} catch (Exception $e) {
+    print sprintf('Error: %s', $e->getMessage());
+    die();
+}
